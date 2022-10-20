@@ -1,10 +1,11 @@
 import { useState } from "react";
+import axios from "axios";
 
 const UploadVideo = () => {
   const [chunkCounter, setChunkCounter] = useState(0);
   const url = "https://sandbox.api.video/upload?token=to1R5LOYV0091XN3GQva27OS";
 
-  const uploadVideo = (event) => {
+  const uploadVideo = async (event) => {
     const files = Array.from(event.target.files);
     console.log("FILES", files);
 
@@ -20,19 +21,31 @@ const UploadVideo = () => {
     let chunkEnd = Math.min(start + chunkSize, file.size);
     let chunkCounter = 0;
 
+    const chunkForm = new FormData();
+
     while (start < file.size) {
       console.log(++chunkCounter + " File from " + start + " - " + chunkEnd);
       const chunk = file.slice(start, chunkEnd);
-      const chunkForm = new FormData();
       chunkForm.append("file", chunk, filename); //chunkForm will send to backend
-
-      for (const value of chunkForm.values()) {
-        console.log("form data", value);
-      }
 
       start += chunkSize;
       chunkEnd = Math.min(start + chunkSize, file.size);
-      
+    }
+
+    await sendVideo(chunkForm);
+  };
+
+  const sendVideo = async (chunkForm) => {
+    for (const value of chunkForm.values()) {
+      console.log("form data", value);
+    }
+
+    const url = "";
+    try {
+      const res = await axios.post(url, chunkForm);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
     }
   };
 
